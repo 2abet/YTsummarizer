@@ -2,10 +2,8 @@ import os
 import requests
 import yt_dlp
 from dotenv import load_dotenv
-
-load_dotenv()
-
-HUGGINGFACE_API_KEY = os.getenv("HUGGINGFACE_API_KEY")
+import streamlit as st
+HUGGINGFACE_API_KEY = st.secrets["HUGGINGFACE_API_KEY"]
 
 def get_transcript(video_url):
     ydl_opts = {
