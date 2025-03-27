@@ -42,14 +42,25 @@ def get_transcript(video_url):
         return " ".join(transcript)
 
 def summarize_text(text):
-    API_URL = "https://api-inference.huggingface.co/models/facebook/bart-large-cnn"
+    API_URL = "https://api-inference.huggingface.co/models/Falconsai/text_summarization"
     headers = {
         "Authorization": f"Bearer {HUGGINGFACE_API_KEY}",
         "Content-Type": "application/json"
     }
+
+    # Craft a better input prompt for depth
+    prompt = (
+        "Please summarize the following transcript in a detailed and informative manner, "
+        "highlighting key points, examples, and structure:\n\n" + text
+    )
+
     payload = {
-        "inputs": text,
-        "parameters": {"max_length": 130, "min_length": 30, "do_sample": False}
+        "inputs": prompt[:2000],  # Truncate if needed
+        "parameters": {
+            "max_length": 250,     # Try 250–400 for longer summaries
+            "min_length": 100,
+            "do_sample": False
+        }
     }
 
     response = requests.post(API_URL, headers=headers, json=payload)
