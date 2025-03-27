@@ -7,7 +7,7 @@ HUGGINGFACE_API_KEY = st.secrets["HUGGINGFACE_API_KEY"]
 
 def get_transcript(video_url):
     ydl_opts = {
-        "quiet": True,
+        "quiet": False,  # enable logs
         "writesubtitles": True,
         "writeautomaticsub": True,
         "skip_download": True,
@@ -18,21 +18,29 @@ def get_transcript(video_url):
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info_dict = ydl.extract_info(video_url, download=False)
-        subtitles = info_dict.get("subtitles") or info_dict.get("automatic_captions")
-        if not subtitles or "en" not in subtitles:
-            return None
-        
-        # Attempt to fetch subtitle URL
-        subtitle_url = subtitles["en"][0]["url"]
-        response = requests.get(subtitle_url)
-        if response.status_code != 200:
+        print("INFO:", info_dict.keys())
+
+        subtitles = info_dict.get("subtitles")
+        auto_captions = info_dict.get("automatic_captions")
+
+        print("Subtitles:", subtitles)
+        print("Automatic Captions:", auto_captions)
+
+        # Try subtitles first, then auto-captions
+        captions = subtitles or auto_captions
+        if not captions or "en" not in captions:
             return None
 
-        # Parse WebVTT to plain text
+        subtitle_url = captions["en"][0]["url"]
+        response = requests.get(subtitle_url)
+        if response.status_code != 200:
+            print("Subtitle download failed:", response.status_code)
+            return None
+
         lines = response.text.splitlines()
         transcript = []
         for line in lines:
-            if "-->" not in line and line.strip() != "":
+            if "-->" not in line and line.strip():
                 transcript.append(line.strip())
 
         return " ".join(transcript)
