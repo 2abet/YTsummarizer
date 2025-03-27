@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
+HUGGINGFACE_API_KEY = os.getenv("HUGGINGFACE_API_KEY")
 
 def get_transcript(video_url):
     ydl_opts = {
@@ -40,21 +40,22 @@ def get_transcript(video_url):
         return " ".join(transcript)
 
 def summarize_text(text):
+    API_URL = "https://api-inference.huggingface.co/models/facebook/bart-large-cnn"
     headers = {
-        "Authorization": f"Bearer {DEEPSEEK_API_KEY}",
-        "Content-Type": "application/json",
+        "Authorization": f"Bearer {HUGGINGFACE_API_KEY}",
+        "Content-Type": "application/json"
     }
-    data = {
-        "model": "deepseek-chat",
-        "messages": [{"role": "user", "content": f"Summarize the following text:\n{text}"}],
-        "max_tokens": 200
+    payload = {
+        "inputs": text,
+        "parameters": {"max_length": 130, "min_length": 30, "do_sample": False}
     }
-    response = requests.post("https://api.deepseek.com/v1/chat/completions", json=data, headers=headers)
-    
+
+    response = requests.post(API_URL, headers=headers, json=payload)
     if response.status_code == 200:
-        return response.json()["choices"][0]["message"]["content"]
+        return response.json()[0]['summary_text']
     else:
-        return f"Error from DeepSeek API: {response.text}"
+        return f"Error: {response.text}"
+
 
 def summarize_video(video_url):
     transcript = get_transcript(video_url)
