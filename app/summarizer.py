@@ -3,7 +3,9 @@ import requests
 import yt_dlp
 from dotenv import load_dotenv
 import streamlit as st
-HUGGINGFACE_API_KEY = st.secrets["HUGGINGFACE_API_KEY"]
+
+# Get API key securely from Streamlit Secrets
+TOGETHER_API_KEY = st.secrets["TOGETHER_API_KEY"]
 
 def get_transcript(video_url):
     ydl_opts = {
@@ -42,30 +44,31 @@ def get_transcript(video_url):
         return " ".join(transcript)
 
 def summarize_text(text):
-    API_URL = "https://api-inference.huggingface.co/models/Falconsai/text_summarization"
+    url = "https://api.together.xyz/v1/chat/completions"
     headers = {
-        "Authorization": f"Bearer {HUGGINGFACE_API_KEY}",
+        "Authorization": f"Bearer {TOGETHER_API_KEY}",
         "Content-Type": "application/json"
     }
 
-    # Craft a better input prompt for depth
-    prompt = (
-        "Please summarize the following transcript in a detailed and informative manner, "
-        "highlighting key points, examples, and structure:\n\n" + text
-    )
-
+    # Instruction prompt for LLaMA 3
     payload = {
-        "inputs": prompt[:2000],  # Truncate if needed
-        "parameters": {
-            "max_length": 250,     # Try 250–400 for longer summaries
-            "min_length": 100,
-            "do_sample": False
-        }
+        "model": "meta-llama/Llama-3-8b-chat",
+        "messages": [
+            {
+                "role": "user",
+                "content": (
+                    "You are a helpful assistant. Please summarize the following YouTube transcript "
+                    "in a detailed and structured way, covering main points, examples, and flow:\n\n" + text
+                )
+            }
+        ],
+        "temperature": 0.3,
+        "max_tokens": 512
     }
 
-    response = requests.post(API_URL, headers=headers, json=payload)
+    response = requests.post(url, headers=headers, json=payload)
     if response.status_code == 200:
-        return response.json()[0]['summary_text']
+        return response.json()["choices"][0]["message"]["content"]
     else:
         return f"Error: {response.text}"
 
