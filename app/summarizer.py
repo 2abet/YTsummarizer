@@ -7,36 +7,32 @@ HUGGINGFACE_API_KEY = st.secrets["HUGGINGFACE_API_KEY"]
 
 def get_transcript(video_url):
     ydl_opts = {
-        "quiet": False,  # enable logs
+        "quiet": True,
         "writesubtitles": True,
         "writeautomaticsub": True,
         "skip_download": True,
-        "subtitlesformat": "vtt",
+        "subtitlesformat": "vtt",  # Prefer VTT or SRT
         "subtitleslangs": ["en"],
-        "outtmpl": "%(id)s.%(ext)s",
+        "outtmpl": "%(id)s.%(ext)s"
     }
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info_dict = ydl.extract_info(video_url, download=False)
-        print("INFO:", info_dict.keys())
 
-        subtitles = info_dict.get("subtitles")
-        auto_captions = info_dict.get("automatic_captions")
-
-        print("Subtitles:", subtitles)
-        print("Automatic Captions:", auto_captions)
-
-        # Try subtitles first, then auto-captions
-        captions = subtitles or auto_captions
-        if not captions or "en" not in captions:
+        # Check requested subtitles
+        subtitles_info = info_dict.get("requested_subtitles", {}).get("en")
+        if not subtitles_info:
             return None
 
-        subtitle_url = captions["en"][0]["url"]
+        subtitle_url = subtitles_info.get("url")
+        if not subtitle_url:
+            return None
+
         response = requests.get(subtitle_url)
         if response.status_code != 200:
-            print("Subtitle download failed:", response.status_code)
             return None
 
+        # Handle WebVTT (vtt) or SRT format
         lines = response.text.splitlines()
         transcript = []
         for line in lines:
