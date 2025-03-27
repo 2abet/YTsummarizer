@@ -11,7 +11,7 @@ This project extracts YouTube video transcripts and summarizes them using DeepSe
 ## Setup Instructions
 
 ```bash
-git clone <repo_url>
+git clone git@github.com:2abet/YTsummarizer.git
 cd youtube_summarizer
 pip install -r requirements.txt
 cp app/.env.example app/.env
