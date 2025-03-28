@@ -52,7 +52,7 @@ def summarize_text(text):
 
     # Instruction prompt for LLaMA 3
     payload = {
-        "model": "meta-llama/Llama-3-8b-chat",
+        "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo",
         "messages": [
             {
                 "role": "user",
