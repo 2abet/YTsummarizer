@@ -1,6 +1,6 @@
-# YouTube Video Summarizer (with DeepSeek)
+# YouTube Video Summarizer (with Together.ai)
 
-This project extracts YouTube video transcripts and summarizes them using DeepSeek's API.
+This project extracts YouTube video transcripts and summarizes them using Togethers's API.
 
 ## Features
 - Input a YouTube video URL
