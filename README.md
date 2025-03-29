@@ -5,8 +5,13 @@ This project extracts YouTube video transcripts and summarizes them using Togeth
 ## Features
 - Input a YouTube video URL
 - Extract the transcript using `yt-dlp`
-- Send the transcript to DeepSeek for summarization
+- Send the transcript to Llama3.3 for summarization
 - View the summary in a Streamlit app
+  
+## 🧭 Workflow Diagram
+
+![Workflow Diagram](assets/diagram.png)
+
 
 ## Setup Instructions
 
