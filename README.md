@@ -17,7 +17,7 @@ pip install -r requirements.txt
 cp app/.env.example app/.env
 ```
 
-Add your DeepSeek API key in the `.env` file:
+Add your Together API key in the `.env`/Secrets file:
 
 ```
 TOGETHER_API_KEY=your_deepseek_api_key_here
